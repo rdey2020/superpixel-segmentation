@@ -1,5 +1,3 @@
-% CLEANUPREGIONS   Cleans up small segments in an image of segmented regions
-%
 % Usage: [seg, Am] = cleanupregions(seg, areaThresh, connectivity)
 %
 % Arguments: seg - A region segmented image, such as might be produced by a
@@ -12,50 +10,16 @@
 %   connectivity - Specify 8 or 4 connectivity.  If not specified 8
 %                  connectivity is assumed.
 %
-%  Note that regions with a label of 0 are ignored.  These are treated as
-%  privileged 'background regions' and are untouched.  If you want these
-%  regions to be considered you should assign a new positive label to these
-%  areas using, say
-%  >> L(L==0) = max(L(:)) + 1;
-%
 % Returns:   seg - The updated segment image.
 %             Am - Adjacency matrix of segments.  Am(i, j) indicates whether
 %                  segments labeled i and j are connected/adjacent
 %
-% Typical application:
-% If a graph cut or superpixel algorithm fails to converge stray segments
-% can be left in the result.  This function tries to clean things up by:
-% 1) Checking there is only one region for each segment label. If there is more
-%    than one region they are given unique labels.
-% 2) Eliminating regions below a specified size and assigning them a label of an
-%    adjacent region.
-%
-% See also: MCLEANUPREGIONS, REGIONADJACENCY, RENUMBERREGIONS
-
-% Copyright (c) 2010 Peter Kovesi
-% Centre for Exploration Targeting
-% School of Earth and Environment
-% The University of Western Australia
-% peter.kovesi at uwa edu au
-%
-% Permission is hereby granted, free of charge, to any person obtaining a copy
-% of this software and associated documentation files (the "Software"), to deal
-% in the Software without restriction, subject to the following conditions:
-% 
-% The above copyright notice and this permission notice shall be included in 
-% all copies or substantial portions of the Software.
-%
-% The Software is provided "as is", without warranty of any kind.
-%
-% October  2010 - Original version
-% February 2013 - Connectivity choice, function returns adjacency matrix.
-
 function [seg, Am] = cleanupregions(seg, areaThresh, connectivity, prioritySeg)
 
     if ~exist('connectivity','var'), connectivity = 8; end
     if ~exist('prioritySeg','var'), prioritySeg = -1; end
     
-    % 1) Ensure every segment is distinct but do not touch segments with a
+    % Ensure every segment is distinct but do not touch segments with a
     % label of 0
     labels = unique(seg(:))';
     maxlabel = max(labels);
@@ -73,7 +37,7 @@ function [seg, Am] = cleanupregions(seg, areaThresh, connectivity, prioritySeg)
     end
 
     if areaThresh
-    % 2) Merge segments with small areas
+    %Merge segments with small areas
     stat = regionprops(seg,'area');  % Get segment areas
     area = cat(1, stat.Area);
     Am = regionadjacency(seg);       % Get adjacency matrix
@@ -102,18 +66,9 @@ function [seg, Am] = cleanupregions(seg, areaThresh, connectivity, prioritySeg)
     
     end
     
-    % 3) As some regions will have been absorbed into others and no longer exist
-    % we now renumber the regions so that they sequentially increase from 1.
-    % We also need to reconstruct the adjacency matrix to reflect the reduced
-    % number of regions and their relabeling
     [seg, minLabel, maxLabel] = renumberregions(seg);
     Am = regionadjacency(seg);    
     
-%-------------------------------------------------------------------
-% Function to merge segment s2 into s1
-% The segment image, Adjacency matrix and area arrays are updated.
-% We could make this a nested function for efficiency but then it would not
-% run under Octave.
 function [seg, Am, area] = mergeregions(s1, s2, seg, Am, area)
     
     if s1==s2
