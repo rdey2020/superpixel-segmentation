@@ -1,5 +1,3 @@
-% SLIC Simple Linear Iterative Clustering SuperPixels
-%
 % Implementation of Achanta, Shaji, Smith, Lucchi, Fua and Susstrunk's
 % SLIC Superpixels
 %
@@ -44,7 +42,6 @@ function [l, Am, Sp, d] = slic(im, k, m, seRadius, colopt)
     end 
       
     MEANCENTRE = 1;
-    MEDIANCENTRE = 2;
     
     if strcmp(colopt, 'mean')
         centre = MEANCENTRE;   
@@ -185,12 +182,7 @@ from row to row
         if centre == MEANCENTRE     
             Sp(n).L = sum(L(mask))/nm;
             Sp(n).a = sum(A(mask))/nm;
-            Sp(n).b = sum(B(mask))/nm;
-            
-        elseif centre == MEDIANCENTRE
-            Sp(n).L = median(L(mask));
-            Sp(n).a = median(A(mask));
-            Sp(n).b = median(B(mask));
+            Sp(n).b = sum(B(mask))/nm;            
         end
         
         Sp(n).r = sum(Y(mask))/nm;
