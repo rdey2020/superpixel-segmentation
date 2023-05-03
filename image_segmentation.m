@@ -1,5 +1,5 @@
 path = 'test_image';
-num = 2;
+num = 3;
 
 for i = 1:1:num  
 	file = [path,'/image',int2str(i),'.jpg']; 
@@ -16,4 +16,3 @@ for i = 1:1:num
     imwrite(I1,[path,'/superpixels/super_',strcat(int2str(i),'.jpg')]); 
 
 end
-
