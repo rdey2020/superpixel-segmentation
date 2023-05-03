@@ -1,7 +1,9 @@
+% SLIC Simple Linear Iterative Clustering SuperPixels
+%
 % Implementation of Achanta, Shaji, Smith, Lucchi, Fua and Susstrunk's
 % SLIC Superpixels
 %
-% Usage:   [l, Am, Sp, d] = slic(im, k, m, seRadius, colopt, mw)
+% Usage:   [l, Am, Sp, d] = slic(im, k, m, seRadius, colopt)
 %
 % Arguments:  im - Image to be segmented.
 %              k - Number of desired superpixels. Note that this is nominal
@@ -41,10 +43,10 @@ function [l, Am, Sp, d] = slic(im, k, m, seRadius, colopt)
     if ~exist('colopt','var') || isempty(colopt), colopt = 'mean'; 
     end 
       
-    MEANCENTRE = 1;
+    MEDIANCENTRE = 1;
     
-    if strcmp(colopt, 'mean')
-        centre = MEANCENTRE;   
+    if strcmp(colopt, 'median')
+        centre = MEDIANCENTRE;   
     else
         error('Invalid colour centre computation option');
     end
@@ -65,8 +67,7 @@ function [l, Am, Sp, d] = slic(im, k, m, seRadius, colopt)
     S = sqrt(rows*cols / (k * sqrt(3)/2));
     
     % Get nodes per row allowing a half column margin at one end that
-    % alternates 
-from row to row
+    % alternates from row to row
     nodeCols = round(cols/S - 0.5);
     % Given an integer number of nodes per row recompute S  
     S = cols/(nodeCols + 0.5); 
@@ -111,7 +112,7 @@ from row to row
     % Now perform the clustering
     S = round(S);  
     
-    for n = 1:nItr
+    for n = 1:10
        for kk = 1:k  % for each cluster
 
            % Get subimage around cluster
@@ -179,10 +180,10 @@ from row to row
     for n = 1:N
         mask = l==n;
         nm = sum(mask(:));
-        if centre == MEANCENTRE     
-            Sp(n).L = sum(L(mask))/nm;
-            Sp(n).a = sum(A(mask))/nm;
-            Sp(n).b = sum(B(mask))/nm;            
+        if centre == MEDIANCENTRE     
+            Sp(n).L = median(L(mask));
+            Sp(n).a = median(A(mask));
+            Sp(n).b = median(B(mask));         
         end
         
         Sp(n).r = sum(Y(mask))/nm;
